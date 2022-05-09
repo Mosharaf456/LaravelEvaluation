@@ -15,7 +15,14 @@ Route::get('/home', [App\Http\Controllers\HomeController::class, 'index'])->name
 Route::get('/products/{category}/category' , 'SearchController@searchProductByCategory');
 
 Route::get('/products' , 'ProductsController@index');
+//
 Route::get('/products/create', 'ProductsController@create');
-Route::post('/products' , 'ProductsController@store');
+Route::post('/products/create','ProductsController@store');
 
 Route::get('/products/{product}' , 'ProductsController@destroy');
+////////////////////////////////////////////////////////////////////////
+
+Route::resource('countries' , 'CountriesController');
+
+
+

@@ -63,7 +63,9 @@ class ProductsController extends Controller
             'category_id' => 'required|exists:categories,id',
             'subcategory_id' => 'required|exists:subcategories,id',
             'price' =>'required|integer|digits_between:1,10' ,
-            'thumbnail' => 'image'
+            'thumbnail' => 'mimes:jpeg,jpg,png,gif|required|max:10000'
+
+        
         ]);
 
         //// dd($validate_data);
@@ -83,19 +85,24 @@ class ProductsController extends Controller
 
         return redirect('/products')->with('success','Product Created Successfully');
 
-        //////ajax  code below 
+    ////// ajax  code below 
+
         // $validator = Validator::make(request()->all(),[
-        //     'title' =>'required|min:1|max:300' ,
-        //     'description' => 'required|min:1',
-        //     // 'category_id' => 'required|exists:categories,id',
+        //     'title' =>'required|min:1|max:300',
+        //     'description' => 'required|min:1|max:400',
         //     'subcategory_id' => 'required|exists:subcategories,id',
-        //     'price' =>'required|integer|digits_between:1,10' ,
-        //     'thumbnail' => 'image'
+        //     'price' =>'required|integer|digits_between:1,10',
+        //     'thumbnail' => 'mimes:jpeg,jpg,png,gif|required|max:10000'
         // ]);
+
         // if($validator->fails())
         // {
-        //     // return $validator->errors();
-        //     return ['status' =>false, 'message'=>'Data validation failed!'];
+        //     // return ['status' =>false, 'message'=>'Data validation failed!!!!'];
+        //     return response()->json([
+        //         'status'=>0, 
+        //         'error'=>$validator->errors()->toArray(),
+        //         'message'=>'Data validation failed!!!!'
+        //     ]);
         // }
 
         // $product = Product::create(request()->all());
@@ -111,7 +118,8 @@ class ProductsController extends Controller
         //     ]);
         // }
 
-        // return ['status' =>true, 'message'=>'Inserted data Successfully.'];
+        // // return ['status' =>true, 'message'=>'Inserted data Successfully.'];
+        // return response()->json(['status'=>1, 'message'=>'Product added successfully!!']);
 
     }
 
