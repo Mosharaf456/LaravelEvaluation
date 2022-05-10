@@ -40,12 +40,14 @@ class ProductsController extends Controller
      */
     public function create()
     {
+        $products = Product::all();
         $categories = Category::all();
         $subCategories = subcategory::all();
     
         return view('products.create' , [
             'categories' => $categories,
-            'subCategories' => $subCategories
+            'subCategories' => $subCategories,
+            'products' => $products
         ]);
     }
 
@@ -57,60 +59,25 @@ class ProductsController extends Controller
      */
     public function store(Request $request)
     {
-        $validate_data = request()->validate([
-            'title' =>'required|min:1|max:300' ,
-            'description' => 'required|min:1',
-            'category_id' => 'required|exists:categories,id',
-            'subcategory_id' => 'required|exists:subcategories,id',
-            'price' =>'required|integer|digits_between:1,10' ,
-            'thumbnail' => 'mimes:jpeg,jpg,png,gif|required|max:10000'
+        // $validate_data = request()->validate([
+        //     'title' =>'required|min:1|max:300' ,
+        //     'description' => 'required|min:1',
+        //     'category_id' => 'required|exists:categories,id',
+        //     'subcategory_id' => 'required|exists:subcategories,id',
+        //     'price' =>'required|integer|digits_between:1,10' ,
+        //     'thumbnail' => 'mimes:jpeg,jpg,png,gif|required|max:10000'
 
         
-        ]);
-
-        //// dd($validate_data);
-
-        $product = Product::create(request()->except('_token' ,'category_id'));
-
-        if(request()->hasFile('thumbnail'))
-        {
-            $ext = request()->file('thumbnail')->getClientOriginalExtension();
-            $file_name = $product->id . '.' . $ext;
-            request()->file('thumbnail')->move('uploads/products' , $file_name ); 
-
-            $product->update([
-                'thumbnail' => $file_name
-            ]);
-        }
-
-        return redirect('/products')->with('success','Product Created Successfully');
-
-    ////// ajax  code below 
-
-        // $validator = Validator::make(request()->all(),[
-        //     'title' =>'required|min:1|max:300',
-        //     'description' => 'required|min:1|max:400',
-        //     'subcategory_id' => 'required|exists:subcategories,id',
-        //     'price' =>'required|integer|digits_between:1,10',
-        //     'thumbnail' => 'mimes:jpeg,jpg,png,gif|required|max:10000'
         // ]);
 
-        // if($validator->fails())
-        // {
-        //     // return ['status' =>false, 'message'=>'Data validation failed!!!!'];
-        //     return response()->json([
-        //         'status'=>0, 
-        //         'error'=>$validator->errors()->toArray(),
-        //         'message'=>'Data validation failed!!!!'
-        //     ]);
-        // }
+        // //// dd($validate_data);
 
-        // $product = Product::create(request()->all());
+        // $product = Product::create(request()->except('_token' ,'category_id'));
 
         // if(request()->hasFile('thumbnail'))
         // {
         //     $ext = request()->file('thumbnail')->getClientOriginalExtension();
-        //     $file_name = $product->id . '.' . $ext;
+        //     $file_name = $product->id .'.' .uniqid(). '.' . $ext;
         //     request()->file('thumbnail')->move('uploads/products' , $file_name ); 
 
         //     $product->update([
@@ -118,8 +85,43 @@ class ProductsController extends Controller
         //     ]);
         // }
 
-        // // return ['status' =>true, 'message'=>'Inserted data Successfully.'];
-        // return response()->json(['status'=>1, 'message'=>'Product added successfully!!']);
+        // return redirect('/products')->with('success','Product Created Successfully');
+
+    ////// ajax  code below 
+
+        $validator = Validator::make(request()->all(),[
+            'title' =>'required|min:1|max:300',
+            'description' => 'required|min:1|max:400',
+            'subcategory_id' => 'required|exists:subcategories,id',
+            'price' =>'required|integer|digits_between:1,10',
+            'thumbnail' => 'mimes:jpeg,jpg,png,gif|required|max:10000'
+        ]);
+
+        if($validator->fails())
+        {
+            // return ['status' =>false, 'message'=>'Data validation failed!!!!'];
+            return response()->json([
+                'status'=>0, 
+                'error'=>$validator->errors()->toArray(),
+                'message'=>'Data validation failed!!!!'
+            ]);
+        }
+
+        $product = Product::create(request()->all());
+
+        if(request()->hasFile('thumbnail'))
+        {
+            $ext = request()->file('thumbnail')->getClientOriginalExtension();
+            $file_name = $product->id.'.' .uniqid(). '.' . $ext;
+            request()->file('thumbnail')->move('uploads/products' , $file_name ); 
+
+            $product->update([
+                'thumbnail' => $file_name
+            ]);
+        }
+
+        // return ['status' =>true, 'message'=>'Inserted data Successfully.' , 'data'=> $product ];
+        return response()->json(['status'=>1, 'message'=>'Product added successfully!!' , 'data'=> $product ]);
 
     }
 

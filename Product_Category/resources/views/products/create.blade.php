@@ -15,8 +15,11 @@
 
                         @include('partials.success_message')
     
-                        <table class="table table-bordered table-hover table-striped">
+                        <table class="table table-bordered table-hover table-striped" >
                             {{-- ajax code to show inseted data and delete but skipped --}}
+                            <thead>
+
+                           
                             <tr>
                                 <th>#ID</th>
                                 <th>Thumnail</th>
@@ -24,19 +27,34 @@
                                 <th>Description</th>
                                 <th>Price</th>
                                 <th>Created At</th>
-                               
+                            
                                 <th>Action</th>
     
                             </tr>
-                            <tr>
-                                <td>1</td>
-                                <td>Image</td>
-                                <td>Title</td>
-                                <td>Description</td>
-                                <td>Price</td>
-                                <td>Created At</td>
-                                <td><a href="" class="btn btn-danger btn-sm">Delete</a></td>
-                            </tr>
+                        </thead>
+                        <tbody id="prouduct_tdata">
+
+                        
+
+                            @foreach ($products as $product)
+                                <tr>
+                                    <td>{{$product->id}}</td>
+                                    <td>
+                                        @if ($product->thumbnail)
+                                            <img src="{{$product->thumbnail_path()}}" class="rounded-circle" 
+                                            style=" float:left; margin-right:15px; " alt="Thumbnail" width="60">
+                                        @endif
+                                    </td>
+                                    <td>{{$product->title}}</td>
+                                    <td>{!!$product->description!!}</td>
+                                    <td>{{$product->price}}</td>
+                                    <td>{{$product->created_at->diffForHumans()}}</td>
+
+                                    <td><a href="/products/{{$product->id}}" class="btn btn-danger btn-sm">Delete</a></td>
+                                </tr>
+                            @endforeach
+
+                        </tbody>
                         </table>
                     </div>
 
@@ -57,46 +75,26 @@
                                 <div id="validation_mesg" class="alert" role="alert"></div>
 
                                <form action="/products/create" method="POST" enctype="multipart/form-data" id="product_form" >
-                           
+
+                                    <input type="hidden" name="_token" value="{{ csrf_token() }}">
+
                                 <div class="form-group">
                                     <label for="title">Product Title</label>
-                                    <input type="text" name="title"  class="form-control"  placeholder="Product Name">
+                                    <input type="text" name="title"  class="form-control" 
+                                      placeholder="Product Name">
                                    
                                     <span class="text-danger error-text title_error"></span>
                                 </div>
-                                {{-- <div class="form-group">
-                                    <label for="description">Product description</label>
-                                    <input type="text" id="description" name="description"  class="form-control "  placeholder="Product description">
-                                    
-                                    <span class="text-danger error-text description_error"></span>
-                                </div> --}}
 
                                 <div class="form-group">
                                     <label for="description">Product description</label>
                                     <textarea id="description"  id="description" class="form-control" 
                                         name="description" placeholder="Product description" rows="4">
-                                    </textarea>
+                                         </textarea>
                                     <span class="text-danger error-text description_error"></span>
 
                                     
                                 </div>
-
-                                {{-- Categories skipped --}}
-
-                                {{-- <div class="form-group">
-                                    <label for="category_id">Product Category</label>
-            
-                                    <select id="category_id" type="text" class="form-control " name="category_id" placeholder="Product category">
-                                        <option value="">Select a Category</option>
-                                        @foreach ($categories as $category)
-                                          <option value="{{ $category->id }}"> {{ $category->title }} </option>
-                                        @endforeach
-                                    </select>
-                                    <span class="text-danger error-text category_id_error"></span>
-                                            
-                                </div> --}}
-
-                                {{-- subCategories --}}
 
                                 <div class="form-group">
                                     <label for="subcategory_id">Product Sub Category</label>
@@ -106,7 +104,7 @@
                                         <option value="">Select a Category</option>
 
                                         @foreach ($subCategories as $subCategory)
-                                          <option value="{{ $subCategory->id }}"> {{ $subCategory->title }} </option>
+                                          <option value="{{ $subCategory->id }}"  > {{ $subCategory->title }} </option>
                                         @endforeach
 
                                     </select>
@@ -116,7 +114,7 @@
             
                                 <div class="form-group">
                                     <label for="price">Product Price</label>
-                                    <input type="text" name="price"  class="form-control"  placeholder="Product Price">
+                                    <input type="text" name="price"  class="form-control"   placeholder="Product Price">
                                    
                                     <span class="text-danger error-text price_error"></span>
                                 
@@ -145,14 +143,17 @@
                 </div>
                     {{-- end of  ajax code /////////////////////////////////////////--}}
 
+
+
                     {{--  Product create without ajax///////////// --}}
 
-                <form action="/products/create" method="post" enctype="multipart/form-data">
+                {{-- <form action="/products/create" method="post" enctype="multipart/form-data">
                     @csrf
                     
                     <div class="form-group">
                         <label for="title">Product Title</label>
-                        <input type="text" name="title"  class="form-control @error('title') is-invalid @enderror"  placeholder="Product Name">
+                        <input type="text" name="title"  class="form-control @error('title') is-invalid @enderror" 
+                             value="{{old('title')}}"  placeholder="Product Name">
                         @error('title')
                                 <span class="invalid-feedback" role="alert">
                                     <strong>{{ $message }}</strong>
@@ -165,8 +166,8 @@
                         <textarea id="description"  
                         id="description"
                         class="form-control @error('description') is-invalid @enderror" 
-                        name="description" placeholder="description" rows="5">
-                        </textarea>
+                        name="description" placeholder="description" rows="4">
+                          {{old('description')}} </textarea>
                         @error('description')
                                 <span class="invalid-feedback" role="alert">
                                     <strong>{{ $message }}</strong>
@@ -180,7 +181,7 @@
                         <select id="category_id" type="text" class="form-control @error('category_id') is-invalid @enderror" name="category_id" placeholder="Product category">
                             <option value="">Select a Category</option>
                             @foreach ($categories as $category)
-                            <option value="{{ $category->id }}"> {{ $category->title }} </option>
+                            <option value="{{ $category->id }}" {{ old('category_id') == $category->id ? 'selected' : '' }} > {{ $category->title }} </option>
                             @endforeach
                         </select>
 
@@ -199,7 +200,7 @@
                         <select id="subcategory_id" type="text" class="form-control @error('subcategory_id') is-invalid @enderror" name="subcategory_id" placeholder="Product Sub category">
                             <option value="">Select a Category</option>
                             @foreach ($subCategories as $subCategory)
-                            <option value="{{ $subCategory->id }}"> {{ $subCategory->title }} </option>
+                            <option value="{{ $subCategory->id }}"  {{ old('subcategory_id') == $subCategory->id ? 'selected' : '' }} > {{ $subCategory->title }} </option>
                             @endforeach
                         </select>
 
@@ -212,7 +213,8 @@
 
                     <div class="form-group">
                         <label for="price">Product Price</label>
-                        <input type="text" name="price"  class="form-control @error('price') is-invalid @enderror"  placeholder="Product Price">
+                        <input type="text" name="price"  class="form-control @error('price') is-invalid @enderror"
+                             value="{{old('price')}}"  placeholder="Product Price">
                         @error('price')
                                 <span class="invalid-feedback" role="alert">
                                     <strong>{{ $message }}</strong>
@@ -234,7 +236,7 @@
                     
                     <button type="submit" class="btn btn-primary btn-sm" >Create Product</button>
                     
-                </form>
+                </form> --}}
 
        {{-- end of Product create without ajax --}}
 
@@ -285,6 +287,26 @@ $(document).ready(function(){
                               });
                     }else{
                         $('#validation_mesg').addClass('alert-success').show().html(res.message);
+
+                        var t_data = ` 
+                            <tr>
+                                <td>${res.data.id}</td>
+                                <td>
+                                    <img src="/uploads/products/${res.data.thumbnail}" class="rounded-circle" 
+                                    style=" float:left; margin-right:15px; " alt="Thumbnail_Image" width="60">
+                                </td>
+                                <td>${res.data.title}</td>
+                                <td>${res.data.description}</td>
+                                <td>${res.data.price}</td>
+                              
+                                <td>{{$product->created_at->diffForHumans()}}</td>
+
+                                <td><a href="/products/${res.data.id}" class="btn btn-danger btn-sm">Delete</a></td>
+
+                            </tr>
+                         `;
+                        $('#prouduct_tdata').append(t_data);
+
                         $('#product_form')[0].reset();
                     }
                     hide_alert();
@@ -301,16 +323,14 @@ $(document).ready(function(){
 });
 
 
-    // ClassicEditor ck editor
-// this create problem on ajax
-
-.create( document.querySelector( '#description' ) )
-    .then( editor => {
-            console.log( editor );
-    } )
-    .catch( error => {
-            console.error( error );
-    } );
+ // ClassicEditor ck editor
+// .create( document.querySelector( '#description' ) )
+//     .then( editor => {
+//             console.log( editor );
+//     } )
+//     .catch( error => {
+//             console.error( error );
+//     } );
 
 </script>
 @endsection

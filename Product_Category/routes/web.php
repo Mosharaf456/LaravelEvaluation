@@ -20,9 +20,9 @@ Route::get('/products/create', 'ProductsController@create');
 Route::post('/products/create','ProductsController@store');
 
 Route::get('/products/{product}' , 'ProductsController@destroy');
-////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////
 
-Route::resource('countries' , 'CountriesController');
+
 
 
 

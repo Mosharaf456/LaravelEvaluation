@@ -25,7 +25,7 @@ class Product extends Model
     //common path declare for files upload
     public function thumbnail_path()
     {
-        return asset("uploads/products/$this->thumbnail");
+        return asset("/uploads/products/$this->thumbnail");
     }
 
 }

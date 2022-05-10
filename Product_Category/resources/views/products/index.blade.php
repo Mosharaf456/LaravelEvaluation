@@ -42,10 +42,10 @@
                                 <td>
                                     
                                     <a href="/products/{{$product->id}}" class="btn btn-danger btn-sm">Delete</a>
-                                </form>
                                 </td>
                             </tr>
                         @endforeach
+                        
                     </table>
                 </div>
             </div>
